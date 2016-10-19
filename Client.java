@@ -75,11 +75,13 @@ public class Client {
 			ioException.printStackTrace();
 		}
 	}
-	//main method
-	public static void main(String args[])
-	{
-		Client client = new Client();
-		client.run();
-	}
+
+
+	// //main method
+	// public static void main(String args[])
+	// {
+	// 	Client client = new Client();
+	// 	client.run();
+	// }
 
 }
