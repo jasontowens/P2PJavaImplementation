@@ -1,5 +1,9 @@
 import java.util.*;
 import java.io.*;
+import java.net.*;
+import java.nio.*;
+import java.nio.channels.*;
+import java.util.*;
 /*
 	peerProcess 
 */
@@ -130,10 +134,24 @@ class peerProcess{
 				neighborHostName = splitLine[1];
 				neighborPortNum = Integer.parseInt(splitLine[2]);
 				neighborFullFile = ( Integer.parseInt(splitLine[3]) != 0 ); // if its 0 -> false  else -> true
-				
+			
+				// does not incorporate error checking right now
+				// meaning that it will add itself into a _neighborInfos
+				// I know this logically doesn't make sense, but it makes it easier to gather
+				// info about this peer that can not be gathered from Common.cfg 
+				// note: later we may have to make sure that when we are looking for eligible
+				// 			neighbors that we do not choose ourself
 				NeighborInfo ni = new NeighborInfo(neighborID, neighborHostName, 
 										neighborPortNum, _fileSize, neighborFullFile);
-	    	    _neighborInfos.add(ni);
+   				_neighborInfos.add(ni);				
+
+   				// this version will only add the neighbor to _neighborInfos
+   				// if it is not THIS peer (aka peerID doesnt match neighborID)
+				// if(_peerID != neighborID) {
+				// 	NeighborInfo ni = new NeighborInfo(neighborID, neighborHostName, 
+				// 							neighborPortNum, _fileSize, neighborFullFile);
+	   			//	_neighborInfos.add(ni);
+	   //  	    } // end if
 	    	} // end while
 
 	    } // end try
@@ -142,6 +160,39 @@ class peerProcess{
 	    	System.out.println("Invalid or not found PeerInfo.cfg");
 	    } // end catch 
 	} // end function
+
+	public void setupServer() {
+		System.out.println("\t\t\t----Setting up server for peerProcess: " + _peerID);
+		System.out.println("\t\t\t\tTrying to get this thing's own port number.");
+		NeighborInfo ni = getNeighborInfo(_peerID);
+		int portNum = ni.getPortNum();
+		System.out.println("\t\t\t\tni.getPortNum() = " + portNum);
+
+		Server s = new Server();
+		s.run(portNum);
+		// majority of this code is from Server.java main()
+		// ServerSocket listener = new ServerSocket(portNum);
+		// int clientNum = 1;
+		// try {
+		// 	while(true) {
+		// 		new Handler(listener.accept(),clientNum).start();
+		// 		System.out.println("Client "  + clientNum + " is connected!");
+		// 		clientNum++;
+		// 	}
+		// } finally {
+		// 	listener.close();
+		// }
+		System.out.println("\t\t\t----Done setting up server for peerProcess: " + _peerID);
+	}
+
+	public NeighborInfo getNeighborInfo(int peerID) {
+		for (int i = 0; i < _neighborInfos.size(); i++) {
+			if (peerID == _neighborInfos.get(i).getPeerID()) {
+				return _neighborInfos.get(i);
+			}
+		}
+		return null;
+	}
 
 	public static void main(String[] args) {
 
@@ -157,7 +208,13 @@ class peerProcess{
 		
 		// make new peer process
 		peerProcess p = new peerProcess();
+
 		// feed it its peerID, and it will know the rest from there
 		p.initialize(peerID);
+
+		// every single peer needs to first set up its listening port / server
+		p.setupServer();
+
+
 	}
 }
