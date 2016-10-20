@@ -7,7 +7,7 @@ import java.util.*;
 public class Server {
 
 	private int sPort = 8000;   //The server will be listening on this port number
-
+	private peerProcess _peerProcess;
 	// public static void main(String[] args) throws Exception {
 	// 	System.out.println("The server is running."); 
 	// 	ServerSocket listener = new ServerSocket(sPort);
@@ -26,6 +26,10 @@ public class Server {
 
 	public Server(){
 
+	}
+
+	public Server(peerProcess p) {
+		_peerProcess = p;
 	}
 
 	public void run(int portNum) {

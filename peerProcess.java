@@ -8,10 +8,11 @@ import java.util.*;
 	peerProcess 
 */
 
-class peerProcess{
+public class peerProcess{
 	// don't think it needs this at the moment, needs to only know info about its neighbors
 	// private PeerInfo _myPeerInfo;
 	ArrayList<NeighborInfo> _neighborInfos;
+	private Server _server;
 	private byte[] _bitfield;
 	private int _peerID;
 	private int _numPreferredNeighbors;
@@ -168,8 +169,8 @@ class peerProcess{
 		int portNum = ni.getPortNum();
 		System.out.println("\t\t\t\tni.getPortNum() = " + portNum);
 
-		Server s = new Server();
-		s.run(portNum);
+		_server = new Server(this);
+		_server.run(portNum);
 		// majority of this code is from Server.java main()
 		// ServerSocket listener = new ServerSocket(portNum);
 		// int clientNum = 1;
@@ -213,8 +214,16 @@ class peerProcess{
 		p.initialize(peerID);
 
 		// every single peer needs to first set up its listening port / server
-		p.setupServer();
+		// p.setupServer();
 
+		// testing grounds
+		Message.MessageType mt1 = Message.MessageType.CHOKE;
+		System.out.println("mt1 = " + mt1);
+		ByteBuffer bb = ByteBuffer.allocate(5);
+		bb.putInt(500);
+		bb.put((byte)0);
+		Message testMsg = Message.parseMessage(bb);
+		// end testing grounds
 
 	}
 }

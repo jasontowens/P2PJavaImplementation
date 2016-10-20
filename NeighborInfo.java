@@ -28,7 +28,7 @@ class NeighborInfo{
 
 		System.out.println("\t----new NeighborInfo created.\n\t\t_peerID = " + _peerID + "\n\t\t_hostName = " + hostName
 							+ "\n\t\t_portNum = " + _portNum + "\n\t\t_bitfield size = " + fileSize + "\n\t\t_fullFile = " + _fullFile
-							+ "\n\t---- end of new NeighborInfo creation.");
+							+ "\n\t----end of new NeighborInfo creation.");
 
 	}
 
