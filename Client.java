@@ -10,8 +10,17 @@ public class Client {
  	ObjectInputStream in;          //stream read from the socket
 	String message;                //message send to the server
 	String MESSAGE;                //capitalized message read from the server
+	peerProcess _pp;
 
-	public void Client() {}
+	public void Client() 
+	{
+
+	}
+
+	public void Client(peerProcess pp) 
+	{
+		_pp = pp;
+	}
 
 	void run()
 	{

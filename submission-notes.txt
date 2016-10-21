@@ -1,0 +1,24 @@
+submission-notes.txt
+midway checkpoint
+brian basnight  jason owens  thomas baldwin
+
+notes:
+	- we have a NeighborInfo class for maintaining necessary information about peers so that choking/unchoking decisions can be made
+	- we have proper initialization of a client and server per peer, and pass a reference to them.
+		- uncomment peerProcess.java line 216 to see the server spin up nicely with all necessary info
+		- we have not properly modified the sample code for client and server to properly handle ByteBuffers instead of whatever they currently use
+	- we have proper message handling based on what type of message it is
+		- we still have to handle piece and bitfield messages, but the others are good
+	- proper processing of config files
+	- each neighbor properly recognizes its neighbors
+
+todo:
+	- choking + peer management (timers, etc)
+	- actual message passing between sockets
+		- handling multiple connections as well
+
+All of the customization / set up is done, now we just have to get down to the message passing and choking.
+if we are a little behind, one of our group members was truly ill the whole past week and was unable to help - has doctor's note if necessary.
+
+Best,
+Team BJT

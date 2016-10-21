@@ -4,15 +4,14 @@ import java.net.*;
 import java.nio.*;
 import java.nio.channels.*;
 import java.util.*;
-/*
-	peerProcess 
-*/
+
 
 public class peerProcess{
 	// don't think it needs this at the moment, needs to only know info about its neighbors
 	// private PeerInfo _myPeerInfo;
 	ArrayList<NeighborInfo> _neighborInfos;
-	private Server _server;
+	private Server _server; // todo brian replace with proper server type
+	private Client _client; // todo brian replace with proper client type
 	private byte[] _bitfield;
 	private int _peerID;
 	private int _numPreferredNeighbors;
@@ -216,13 +215,26 @@ public class peerProcess{
 		// every single peer needs to first set up its listening port / server
 		// p.setupServer();
 
+
+
 		// testing grounds
-		Message.MessageType mt1 = Message.MessageType.CHOKE;
-		System.out.println("mt1 = " + mt1);
-		ByteBuffer bb = ByteBuffer.allocate(5);
+
+		// Message.MessageType mt1 = Message.MessageType.HAVE;
+		// System.out.println("main: mt1 = " + mt1);
+		ByteBuffer bb = ByteBuffer.allocate(9);
 		bb.putInt(500);
-		bb.put((byte)0);
+		bb.put((byte)6);
+		bb.putInt(325);
 		Message testMsg = Message.parseMessage(bb);
+		System.out.println("main: testMsg.getMessageType() = " + testMsg.getMessageType());
+
+		// if it is a HAVE or REQUEST message, use this block to test the input pieceIndex
+		ByteBuffer testbb = testMsg.getByteBuffer();
+		testbb.rewind();
+		System.out.println("testbb.getInt() = " + testbb.getInt());
+		//
+
+
 		// end testing grounds
 
 	}
