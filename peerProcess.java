@@ -6,13 +6,14 @@ import java.nio.channels.*;
 import java.util.*;
 
 
-public class peerProcess{
+public class peerProcess implements Runnable{
 	// don't think it needs this at the moment, needs to only know info about its neighbors
 	// private PeerInfo _myPeerInfo;
 	ArrayList<NeighborInfo> _neighborInfos;
 	private Server _server; // todo brian replace with proper server type
 	private Client _client; // todo brian replace with proper client type
-	private byte[] _bitfield;
+	// private byte[] _bitfield;
+	private BitField _bitfield;
 	private int _peerID;
 	private int _numPreferredNeighbors;
 	private int _unchokingInterval;
@@ -194,6 +195,117 @@ public class peerProcess{
 		return null;
 	}
 
+	public void run() {
+	// 	try {
+	// 		initConnections();
+	// 		System.out.println("Connections started");
+
+	// 		long unchokeTime = System.currentTimeMillis();
+	// 		long optTime = System.currentTimeMillis();
+
+	// 		List<PeerRecord> peerList = new ArrayList<PeerRecord>(peerMap.values());
+
+	// 		while(true){
+	// 			handleMessages(peerList);
+
+	// 			if(System.currentTimeMillis() > unchokeTime + 1000*config.getUnchokingInterval()) {
+	// 				unchokingUpdate();
+	// 				unchokeTime = System.currentTimeMillis();
+	// 			}
+
+	// 			if(System.currentTimeMillis() > optTime + 1000*config.getOptomisticUnChokingInterval()) {
+	// 				optomisticUnchokingUpdate();
+	// 				optTime = System.currentTimeMillis();
+	// 			}
+	// 		}
+	// 	} 
+	// 	catch (Exception e) {
+	// 		e.printStackTrace();
+	// 	}
+	}
+
+	public synchronized void handleMessages(ArrayList<NeighborInfo> peers) throws Exception {
+		for(NeighborInfo peer: peers) {
+			// check to see if the peer has enough data to warrant a read
+			if(peer._inStream.available() >= 5) {
+				Message receivedMessage = new Message();
+				receivedMessage.setPieceSize(_pieceSize);
+				receivedMessage.readMessage(peer,_peerID); //read message
+		
+				switch (receivedMessage.getMessageType()) {
+					case HANDSHAKE:
+						handleHandshake(peer,receivedMessage);
+						break;
+		
+					case BITFIELD:
+						handleBitfield(peer,receivedMessage);
+						break;
+		
+					case INTERESTED:
+						peer._isInterested = true; //update my record of the peer saying it's interested in my
+						// myLogger.logReceiveInterested(peer.peerID); //log the received interested message
+						break;
+		
+					case NOTINTERESTED:
+						peer._isInterested = false; 
+						// myLogger.logNotInterested(peer.peerID);
+						break;
+		
+					case CHOKE:
+						// myLogger.logChoking(peer.peerID); //log the received notinterested message
+						break;
+					
+					case UNCHOKE:
+						handleUnchoke(peer,receivedMessage);
+						break;
+		
+					case REQUEST:
+						handleRequest(peer,receivedMessage);
+						break;
+		
+					case PIECE:
+						handlePiece(peer,receivedMessage);
+						break;
+						
+					case HAVE:
+						handleHave(peer,receivedMessage);
+						break;
+						
+					default:
+						break;
+				}
+			
+			}
+		}
+	}
+
+	public void handleHandshake(NeighborInfo peer, Message receivedMessage) throws Exception {
+		System.out.println("Peer:" + _peerID + " got handshake from Peer:" + peer._peerID);
+		if(peer._handshakeSent) {
+			System.out.println("Peer:" + _peerID + " has already sent a HANDSHAKE to Peer:" + peer._peerID);
+			System.out.println("Peer:" + _peerID + " sending bitfield to Peer:" + peer._peerID);
+			// myLogger.logTCPConnTo(peer.peerID);
+			receivedMessage.wipe();
+			receivedMessage.sendBitField(peer,_bitfield);
+		}
+		else {
+			System.out.println("Peer:" + _peerID + " has not yet sent a HANDSHAKE to Peer:" + peer._peerID);
+			System.out.println("Peer:" + _peerID + " sending handshake 2 to Peer:" + peer._peerID);
+			// myLogger.logTCPConnFrom(peer.peerID);
+			receivedMessage.wipe();
+			receivedMessage.sendHandShake(peer, _peerID);
+		}
+	}
+
+
+
+
+
+
+
+
+
+
 	public static void main(String[] args) {
 
 		int peerID;
@@ -208,7 +320,6 @@ public class peerProcess{
 		
 		// make new peer process
 		peerProcess p = new peerProcess();
-
 		// feed it its peerID, and it will know the rest from there
 		p.initialize(peerID);
 
@@ -228,10 +339,12 @@ public class peerProcess{
 		Message testMsg = Message.parseMessage(bb);
 		System.out.println("main: testMsg.getMessageType() = " + testMsg.getMessageType());
 
+
+
 		// if it is a HAVE or REQUEST message, use this block to test the input pieceIndex
-		ByteBuffer testbb = testMsg.getByteBuffer();
-		testbb.rewind();
-		System.out.println("testbb.getInt() = " + testbb.getInt());
+		// ByteBuffer testbb = testMsg.getByteBuffer();
+		// testbb.rewind();
+		// System.out.println("testbb.getInt() = " + testbb.getInt());
 		//
 
 

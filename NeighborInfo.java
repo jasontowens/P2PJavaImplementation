@@ -18,9 +18,9 @@ class NeighborInfo{
 	// public byte[] _bitfield;
 	public BitField _bitfield;
 
-	public Socket socket;
-	public DataInputStream inStream;
-	public DataOutputStream outStream;
+	public Socket _socket;
+	public DataInputStream _inStream;
+	public DataOutputStream _outStream;
 
 	public boolean _isOUneighbour; 	// optimistically unchoked
 	public boolean _isChoked;
