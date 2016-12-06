@@ -14,6 +14,7 @@ public class peerProcess{
 	private Client _client; // todo brian replace with proper client type
 	private byte[] _bitfield;
 	private int _peerID;
+	private int _portNum;
 	private int _numPreferredNeighbors;
 	private int _unchokingInterval;
 	private int _ouInterval;
@@ -116,7 +117,6 @@ public class peerProcess{
 	} // end parseCommonConfig
 
 	private void parsePeerConfig(String peerInfoFileName) {
-
 		int neighborID;
 		String neighborHostName;
 		int neighborPortNum;
@@ -143,7 +143,11 @@ public class peerProcess{
 				// 			neighbors that we do not choose ourself
 				NeighborInfo ni = new NeighborInfo(neighborID, neighborHostName, 
 										neighborPortNum, _fileSize, neighborFullFile);
-   				_neighborInfos.add(ni);				
+   				_neighborInfos.add(ni);		
+					
+					if (ni._peerID == _peerID) {
+						_portNum = neighborPortNum;
+					}		
 
    				// this version will only add the neighbor to _neighborInfos
    				// if it is not THIS peer (aka peerID doesnt match neighborID)
@@ -160,6 +164,25 @@ public class peerProcess{
 	    	System.out.println("Invalid or not found PeerInfo.cfg");
 	    } // end catch 
 	} // end function
+	
+	public void setupConnections() {
+		//get the peerMap and sort it by peerID
+		List<NeighborInfo> sortedNeighbors = _neighborInfos;
+		Collections.sort(sortedNeighbors);
+		sortedNeighbors.remove(Integer.valueOf(this._peerID)); //ensure my peer info isn't in the list
+
+		for (NeighborInfo neighbor: sortedNeighbors) 
+		{
+			//if we appear first we are a server
+			if(_peerID < neighbor._peerID) {
+				this.setupServer();
+			} 			
+			//if we appear second we are a client
+			else if(_peerID > neighbor._peerID) {
+				this.setupClient();
+			}
+		}
+	}
 
 	public void setupServer() {
 		System.out.println("\t\t\t----Setting up server for peerProcess: " + _peerID);
@@ -183,6 +206,18 @@ public class peerProcess{
 		// 	listener.close();
 		// }
 		System.out.println("\t\t\t----Done setting up server for peerProcess: " + _peerID);
+	}
+
+	public void setupClient() {
+		System.out.println("\t\t\t----Setting up client for peerProcess: " + _peerID);
+		
+		NeighborInfo ni = getNeighborInfo(_peerID);
+		String hostName = ni.getHostName();
+
+		_client = new Client(this);
+		_client.run(hostName, _portNum);
+
+		System.out.println("\t\t\t----Done setting up client for peerProcess: " + _peerID);
 	}
 
 	public NeighborInfo getNeighborInfo(int peerID) {
@@ -213,9 +248,7 @@ public class peerProcess{
 		p.initialize(peerID);
 
 		// every single peer needs to first set up its listening port / server
-		// p.setupServer();
-
-
+		p.setupConnections();
 
 		// testing grounds
 

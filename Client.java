@@ -10,24 +10,22 @@ public class Client {
  	ObjectInputStream in;          //stream read from the socket
 	String message;                //message send to the server
 	String MESSAGE;                //capitalized message read from the server
-	peerProcess _pp;
+	private peerProcess _peerProcess;
 
-	public void Client() 
-	{
+	public Client(){
 
 	}
 
-	public void Client(peerProcess pp) 
-	{
-		_pp = pp;
+	public Client(peerProcess p) {
+		_peerProcess = p;
 	}
 
-	void run()
+	public void run(String hostName, int portNum)
 	{
 		try{
 			//create a socket to connect to the server
-			requestSocket = new Socket("localhost", 8000);
-			System.out.println("Connected to localhost in port 8000");
+			requestSocket = new Socket("localhost", portNum);
+			System.out.println("Connected to " + hostName + " in port " + portNum);
 			//initialize inputStream and outputStream
 			out = new ObjectOutputStream(requestSocket.getOutputStream());
 			out.flush();

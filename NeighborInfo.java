@@ -8,7 +8,7 @@ import java.util.concurrent.*;
 	NeighborInfo is meant for a peer to store key attributes about a (seperate, single) connected peer. Attributes herein are what is "known" not necessarily what is true.  
 */
 
-class NeighborInfo{
+class NeighborInfo implements Comparable<NeighborInfo> {
 	public int _peerID;
 	public String _hostName;
 	public int _portNum;
@@ -63,10 +63,17 @@ class NeighborInfo{
 	public int getPortNum() {
 		return _portNum;
 	}
+	
+	public String getHostName() {
+		return _hostName;
+	}
 
 	// public byte[] getBitfield() {
 	public BitField getBitfield() {
 		return _bitfield;
 	}
-
+	
+	public int compareTo(NeighborInfo other) {
+		return this._peerID - other._peerID;
+	}
 }
