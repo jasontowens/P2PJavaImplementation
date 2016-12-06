@@ -106,11 +106,16 @@ public abstract class Message
 		bb.rewind();
 		// reads next 32 bits and returns its as an int, exactly what we need to do
 		int messageLength = bb.getInt();
-		// System.out.println("messageLength = " + messageLength);
+
+		// grab the message type, it is going to signal what type of message we are reading
 		byte messageTypeByte = bb.get();
+		
+		// parse the byte we just gathered into our new enum MessageType
+		MessageType messageType = MessageType.get(messageTypeByte);
+
+		// System.out.println("messageLength = " + messageLength);
 		// System.out.println("messageTypeByte = " + (int)messageTypeByte);
 		// MessageType messageType = MessageType.messageTypeByte;
-		MessageType messageType = MessageType.get(messageTypeByte);
 		// System.out.println("messageType = " + messageType);
 
 		switch (messageType) {
@@ -120,6 +125,7 @@ public abstract class Message
 				// _data = bb;
 				// _messageType = messageType;
 				// return this;
+				
 			case UNCHOKE:
 				return UnchokeMessage.parseMessage((bb).slice());
 

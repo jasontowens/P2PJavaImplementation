@@ -1,3 +1,8 @@
+import java.io.*;
+import java.net.*;
+import java.nio.*;
+import java.util.*;
+import java.util.concurrent.*;
 
 /*
 	NeighborInfo is meant for a peer to store key attributes about a (seperate, single) connected peer. Attributes herein are what is "known" not necessarily what is true.  
@@ -8,11 +13,21 @@ class NeighborInfo{
 	public String _hostName;
 	public int _portNum;
 	public boolean _fullFile;
+
 	public int _speed;
-	public byte[] _bitfield;
+	// public byte[] _bitfield;
+	public BitField _bitfield;
+
+	public Socket socket;
+	public DataInputStream inStream;
+	public DataOutputStream outStream;
+
 	public boolean _isOUneighbour; 	// optimistically unchoked
-	public boolean _choked;
-	public boolean _interested;
+	public boolean _isChoked;
+	public boolean _handshakeSent;
+	public boolean _amIInterested;
+	public boolean _isInterested;
+
 	
 
 
@@ -23,7 +38,8 @@ class NeighborInfo{
 		_peerID = peerID;
 		_hostName = hostName;
 		_portNum = portNum;
-		_bitfield = new byte[fileSize];
+		// _bitfield = new byte[fileSize];
+		_bitfield = new BitField(fileSize);
 		_fullFile = fullFile;
 
 		System.out.println("\t----new NeighborInfo created.\n\t\t_peerID = " + _peerID + "\n\t\t_hostName = " + hostName
@@ -48,10 +64,9 @@ class NeighborInfo{
 		return _portNum;
 	}
 
-	public byte[] getBitfield() {
+	// public byte[] getBitfield() {
+	public BitField getBitfield() {
 		return _bitfield;
 	}
-
-
 
 }
