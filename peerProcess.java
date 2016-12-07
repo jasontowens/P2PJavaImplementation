@@ -531,12 +531,14 @@ public class peerProcess implements Runnable{
 			System.out.println("Peer#" + _peerID + " has already sent a HANDSHAKE to Peer#" + peer._peerID);
 			System.out.println("Peer#" + _peerID + " sending bitfield to Peer#" + peer._peerID);
 			receivedMessage.wipe();
+			receivedMessage.setPieceSize(_pieceSize);
 			receivedMessage.sendBitField(peer,_bitfield);
 		}
 		else {
 			System.out.println("Peer#" + _peerID + " has not yet sent a HANDSHAKE to Peer#" + peer._peerID);
 			System.out.println("Peer#" + _peerID + " sending handshake 2 to Peer#" + peer._peerID);
 			receivedMessage.wipe();
+			receivedMessage.setPieceSize(_pieceSize);
 			receivedMessage.sendHandShake(peer, _peerID);
 		}
 	}
