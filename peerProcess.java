@@ -175,8 +175,16 @@ public class peerProcess implements Runnable{
 	public void setupConnections() {
 		//get the peerMap and sort it by peerID
 		Collections.sort(_neighborInfos);
-		_neighborInfos.remove(Integer.valueOf(_peerID)); //ensure my peer info isn't in the list
-
+		
+		int count = 0;
+		for (NeighborInfo peer: _neighborInfos) {
+			if (peer._peerID == _peerID) {
+				_neighborInfos.remove(count); //ensure my peer info isn't in the list
+			}
+			
+			count++;
+		}
+		
 		int index = 0;
 		for (NeighborInfo peer: _neighborInfos) {
 			//if we appear first we are a server
