@@ -187,14 +187,17 @@ public class peerProcess implements Runnable{
 					System.out.println("Peer:" + _peerID + " listening for hostname " + hostName + " via socket " + _portNum);
 					ServerSocket serv = new ServerSocket(_portNum); //create server socket
 					Socket socket = serv.accept();	//now listen for requests
-					// serv.close(); //close the server socket now that it is not needed
+					serv.close(); //close the server socket now that it is not needed
 					System.out.println("Peer:" + _peerID + " heard news from " + socket.getInetAddress().toString());
 
 					//create input and output data streams, and save them in the peer
 					DataOutputStream outStream = new DataOutputStream(socket.getOutputStream());
+					System.out.println("Here is the outStream: " + outStream);
 					outStream.flush();
-					DataInputStream inStream = new DataInputStream(socket.getInputStream());
 					
+					DataInputStream inStream = new DataInputStream(socket.getInputStream());
+					System.out.println("Here is the inStream: " + inStream);
+
 					Message handShake = new Message();
 					handShake.setPieceSize(_pieceSize);
 					handShake.readMessage(peer, _peerID);
