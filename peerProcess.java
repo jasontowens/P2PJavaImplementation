@@ -258,6 +258,7 @@ public class peerProcess implements Runnable{
 				}
 			}
 			
+			System.out.println("Loop #" + index);
 			index++;
 		}
 	}
