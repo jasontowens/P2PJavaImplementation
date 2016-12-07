@@ -297,11 +297,6 @@ public class Message
 
 
 
-
-
-
-
-
 	// nested class for piece contents
 	public static class PieceMessage extends Message 
 	{
