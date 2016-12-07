@@ -137,6 +137,7 @@ public class Message
 		int numBytesRecvd = 0;
 		int totalBytesRecvd = 0;
 		while (totalBytesRecvd < 5) {
+			System.out.println(5);
 			// 	arguments: byte array stored in, offset, length
 			// from java docs:
 			// Reads up to len bytes of data from the contained input stream into an array of bytes.
@@ -153,6 +154,7 @@ public class Message
 			byte [] temp1 = new byte[27];
 			totalBytesRecvd = 0;
 			while (totalBytesRecvd < 27) {
+				System.out.println(27);
 				// arguments: byte array stored in, offset, length
 				// from java docs:
 				// Reads up to len bytes of data from the contained input stream into an array of bytes.
