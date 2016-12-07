@@ -182,8 +182,7 @@ public class peerProcess implements Runnable{
 			//if we appear first we are a server
 			if(_peerID < peer._peerID) {
 				try {
-					NeighborInfo ni = getNeighborInfo(_peerID);
-					String hostName = ni.getHostName();
+					String hostName = peer.getHostName();
 					
 					System.out.println("Peer:" + _peerID + " listening for hostname " + hostName + " via socket " + _portNum);
 					ServerSocket serv = new ServerSocket(_portNum); //create server socket
@@ -213,9 +212,8 @@ public class peerProcess implements Runnable{
 			//if we appear second we are a client
 			else if(_peerID > peer._peerID) {
 				try {
-					NeighborInfo ni = getNeighborInfo(_peerID);
-					String hostName = "lin114-00.cise.ufl.edu";
-					int portNum = ni.getPortNum();
+					String hostName = peer.getHostName();
+					int portNum = peer.getPortNum();
 
 					System.out.println("Peer:" + _peerID + " trying to connect to " + hostName + " via socket " + portNum);
 					Socket socket = new Socket(hostName, portNum);
