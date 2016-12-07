@@ -208,9 +208,10 @@ public class peerProcess implements Runnable{
 					for (NeighborInfo peerToUpdate: _neighborInfos) {
 							if (peerToUpdate._peerID == peer._peerID) {
 								_neighborInfos.set(index, peer);  
+								index++;
 							}
 							
-							index++;
+							System.out.println("here is the index: " + index);
 					}
 
 					Message handShake = new Message();
@@ -253,9 +254,10 @@ public class peerProcess implements Runnable{
 					for (NeighborInfo peerToUpdate: _neighborInfos) {
 							if (peerToUpdate._peerID == peer._peerID) {
 								_neighborInfos.set(index, peer);  
+								index++;
 							}
 							
-							index++;
+							System.out.println("here is the index: " + index);
 					}
 
 					//create input and output data streams, and save them in the peer
