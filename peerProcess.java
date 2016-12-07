@@ -174,7 +174,6 @@ public class peerProcess implements Runnable{
 	
 	public void setupConnections() {
 		//get the peerMap and sort it by peerID
-		
 		List<NeighborInfo> sortedNeighbors = _neighborInfos;
 		Collections.sort(sortedNeighbors);
 		sortedNeighbors.remove(Integer.valueOf(_peerID)); //ensure my peer info isn't in the list
@@ -202,6 +201,15 @@ public class peerProcess implements Runnable{
 					peer._inStream = inStream;
 					peer._outStream = outStream;
 					peer._socket = socket;
+
+					Message handShake = new Message();
+					handShake.setPieceSize(_pieceSize);					
+
+					System.out.println("Calling readMessage");
+					handShake.readMessage(peer, _peerID);
+					
+					System.out.println("Calling handleHandshake");
+					handleHandshake(peer, handShake);
 					
 					int index = 0;
 					for (NeighborInfo peerToUpdate: _neighborInfos) {
@@ -212,15 +220,6 @@ public class peerProcess implements Runnable{
 							
 							System.out.println("here is the index: " + index);
 					}
-
-					Message handShake = new Message();
-					handShake.setPieceSize(_pieceSize);					
-
-					System.out.println("Calling readMessage");
-					handShake.readMessage(peer, _peerID);
-					
-					System.out.println("Calling handleHandshake");
-					handleHandshake(peer, handShake);
 					
 					System.out.println("Finished calling handleHandshake");
 				}
