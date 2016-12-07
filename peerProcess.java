@@ -179,11 +179,13 @@ public class peerProcess implements Runnable{
 		int count = 0;
 		for (NeighborInfo peer: _neighborInfos) {
 			if (peer._peerID == _peerID) {
-				_neighborInfos.remove(count); //ensure my peer info isn't in the list
+				break;
 			}
 			
 			count++;
 		}
+		
+		_neighborInfos.remove(count); //ensure my peer info isn't in the list
 		
 		int index = 0;
 		for (NeighborInfo peer: _neighborInfos) {
