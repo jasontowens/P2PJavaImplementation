@@ -64,9 +64,9 @@ public class peerProcess implements Runnable{
 	}
 
 	// don't think we should be able to setPeerID after it is constructed -> commented out for now
-	// public void setPeerID(int newID){
-	// 	_peerID = newID;
-	// }
+	public void setPeerID(int newID){
+		_peerID = newID;
+	}
 
 	public int getPeerID(){
 		return _peerID;
@@ -303,35 +303,6 @@ public class peerProcess implements Runnable{
 		return null;
 	}
 
-	public void run() {
-	// 	try {
-	// 		initConnections();
-	// 		System.out.println("Connections started");
-
-	// 		long unchokeTime = System.currentTimeMillis();
-	// 		long optTime = System.currentTimeMillis();
-
-	// 		List<PeerRecord> peerList = new ArrayList<PeerRecord>(peerMap.values());
-
-	// 		while(true){
-	// 			handleMessages(peerList);
-
-	// 			if(System.currentTimeMillis() > unchokeTime + 1000*config.getUnchokingInterval()) {
-	// 				unchokingUpdate();
-	// 				unchokeTime = System.currentTimeMillis();
-	// 			}
-
-	// 			if(System.currentTimeMillis() > optTime + 1000*config.getOptomisticUnChokingInterval()) {
-	// 				optomisticUnchokingUpdate();
-	// 				optTime = System.currentTimeMillis();
-	// 			}
-	// 		}
-	// 	} 
-	// 	catch (Exception e) {
-	// 		e.printStackTrace();
-	// 	}
-	}
-
 	public synchronized void handleMessages(ArrayList<NeighborInfo> peers) throws Exception {
 		for(NeighborInfo peer : peers) {
 			// check to see if the peer has enough data to warrant a read
@@ -545,6 +516,37 @@ public class peerProcess implements Runnable{
 
 
 
+	public void run() {
+		try {
+			// todo remove parameter from function
+			initialize(_peerID);
+			setupConnections();
+			System.out.println("Connections started");
+
+			// long unchokeTime = System.currentTimeMillis();
+			// long optTime = System.currentTimeMillis();
+
+			// List<PeerRecord> peerList = new ArrayList<PeerRecord>(peerMap.values());
+
+			while(true){
+				// todo remove parameter from function
+				handleMessages(_neighborInfos);
+
+				// if(System.currentTimeMillis() > unchokeTime + 1000*config.getUnchokingInterval()) {
+				// 	unchokingUpdate();
+				// 	unchokeTime = System.currentTimeMillis();
+				// }
+
+				// if(System.currentTimeMillis() > optTime + 1000*config.getOptomisticUnChokingInterval()) {
+				// 	optomisticUnchokingUpdate();
+				// 	optTime = System.currentTimeMillis();
+				// }
+			}
+		} 
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
 
 
 
@@ -562,32 +564,18 @@ public class peerProcess implements Runnable{
 		}
 		
 		// make new peer process
-		peerProcess p = new peerProcess();
+		// peerProcess p = new peerProcess();
 		// feed it its peerID, and it will know the rest from there
-		p.initialize(peerID);
+		// p.initialize(peerID);
 
 		// every single peer needs to first set up its listening port / server
-		p.setupConnections();
+		// p.setupConnections();
+
+		peerProcess p = new peerProcess();
+		p.setPeerID(peerID);
+		p.run();
 
 		// testing grounds
-
-		// Message.MessageType mt1 = Message.MessageType.HAVE;
-		// System.out.println("main: mt1 = " + mt1);
-		ByteBuffer bb = ByteBuffer.allocate(9);
-		bb.putInt(500);
-		bb.put((byte)6);
-		bb.putInt(325);
-		Message testMsg = Message.parseMessage(bb);
-		System.out.println("main: testMsg.getMessageType() = " + testMsg.getMessageType());
-
-
-
-		// if it is a HAVE or REQUEST message, use this block to test the input pieceIndex
-		// ByteBuffer testbb = testMsg.getByteBuffer();
-		// testbb.rewind();
-		// System.out.println("testbb.getInt() = " + testbb.getInt());
-		//
-
 
 		// end testing grounds
 
