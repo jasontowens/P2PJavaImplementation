@@ -201,6 +201,8 @@ public class peerProcess implements Runnable{
 					peer._inStream = inStream;
 					peer._outStream = outStream;
 					peer._socket = socket;
+					
+					System.out.println("Here is the index: " + index);
 					_neighborInfos.set(index, peer);
 
 					Message handShake = new Message();
@@ -238,6 +240,8 @@ public class peerProcess implements Runnable{
 					peer._inStream = inStream;
 					peer._outStream = outStream;
 					peer._socket = socket;
+					
+					System.out.println("Here is the index: " + index);
 					_neighborInfos.set(index, peer);
 
 					//create input and output data streams, and save them in the peer
@@ -307,8 +311,8 @@ public class peerProcess implements Runnable{
 		return null;
 	}
 
-	public synchronized void handleMessages(ArrayList<NeighborInfo> peers) throws Exception {
-		for(NeighborInfo peer : peers) {
+	public synchronized void handleMessages() throws Exception {
+		for(NeighborInfo peer : _neighborInfos) {
 			// check to see if the peer has enough data to warrant a read
 			if(peer._inStream.available() >= 5) {
 				Message receivedMessage = new Message();
@@ -535,7 +539,7 @@ public class peerProcess implements Runnable{
 			while(true){
 				// todo remove parameter from function
 				System.out.println("peerProcess::run() -- in the while loop.");
-				handleMessages(_neighborInfos);
+				handleMessages();
 
 				// if(System.currentTimeMillis() > unchokeTime + 1000*config.getUnchokingInterval()) {
 				// 	unchokingUpdate();
