@@ -265,7 +265,7 @@ public class Message
 		try {
 			peer._outStream.write(outgoingMessage, 0, outgoingMessage.length);
 			if(_data != null){
-				peer._outStream.write(_data,0,_data.length);
+				peer._outStream.write(_data, 0, _data.length);
 			}
 			
 			
