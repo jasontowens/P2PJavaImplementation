@@ -49,10 +49,16 @@ public class peerProcess implements Runnable{
 		// kept out of the function kind of unnecessarily, but fn would still work
 		// if out of order config files were expected
 		//calculate pieceCount
+		
 		_numPieces = _fileSize / _pieceSize;
+		System.out.println("Number of pieces before calculation: " + _numPieces);
+		
 		if(_fileSize % _pieceSize != 0) {
 			_numPieces++;
 		}
+				
+		System.out.println("Number of byte pieces after calculation: " + _numPieces);
+		
 		
 		_bitfield = new BitField(_numPieces);
 

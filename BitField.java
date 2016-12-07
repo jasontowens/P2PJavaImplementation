@@ -74,7 +74,6 @@ public class BitField {
 			int whichByte = i/8;
 			int whichBit = i%8;
 			
-			System.out.println("Here is the whichByte value: " + whichByte);
 			if ((bytes[whichByte] & (1 << whichBit)) == 0) {
 				bitField[i] = false;
 			} else {
