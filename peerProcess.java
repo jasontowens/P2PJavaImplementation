@@ -214,7 +214,7 @@ public class peerProcess implements Runnable{
 			else if(_peerID > peer._peerID) {
 				try {
 					NeighborInfo ni = getNeighborInfo(_peerID);
-					String hostName = ni.getHostName();
+					String hostName = "lin114-00.cise.ufl.edu";
 					int portNum = ni.getPortNum();
 
 					System.out.println("Peer:" + _peerID + " trying to connect to " + hostName + " via socket " + portNum);
