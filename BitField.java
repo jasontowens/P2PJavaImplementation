@@ -68,12 +68,14 @@ public class BitField {
 	}
 	
 	public void setBitField(byte[] bytes) {
-		System.out.println("Number of pieces are: " + piecesCount);
-		
 		piecesCountDowned = 0;
 		for (int i = 0; i < piecesCount; i++) {
 			int whichByte = i/8;
 			int whichBit = i%8;
+			
+			if (bytes.length <= whichByte) {
+				break;
+			}
 			
 			if ((bytes[whichByte] & (1 << whichBit)) == 0) {
 				bitField[i] = false;
