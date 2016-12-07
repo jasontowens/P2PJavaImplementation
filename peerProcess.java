@@ -174,19 +174,76 @@ public class peerProcess implements Runnable{
 	
 	public void setupConnections() {
 		//get the peerMap and sort it by peerID
-		List<NeighborInfo> sortedNeighbors = _neighborInfos;
-		Collections.sort(sortedNeighbors);
-		sortedNeighbors.remove(Integer.valueOf(_peerID)); //ensure my peer info isn't in the list
+		Collections.sort(_neighborInfos);
+		_neighborInfos.remove(Integer.valueOf(_peerID)); //ensure my peer info isn't in the list
 
-		for (NeighborInfo neighbor: sortedNeighbors) 
+		for (NeighborInfo peer: _neighborInfos) 
 		{
 			//if we appear first we are a server
-			if(_peerID < neighbor._peerID) {
-				setupServer();
+			if(_peerID < peer._peerID) {
+				try {
+					NeighborInfo ni = getNeighborInfo(_peerID);
+					String hostName = ni.getHostName();
+					
+					System.out.println("Peer:" + _peerID + " listening for hostname " + hostName + " via socket " + _portNum);
+					ServerSocket serv = new ServerSocket(_portNum); //create server socket
+					Socket socket = serv.accept();	//now listen for requests
+					serv.close(); //close the server socket now that it is not needed
+					System.out.println("Peer:" + _peerID + " heard news from " + socket.getInetAddress().toString());
+
+					//create input and output data streams, and save them in the peer
+					DataOutputStream outStream = new DataOutputStream(socket.getOutputStream());
+					outStream.flush();
+					DataInputStream inStream = new DataInputStream(socket.getInputStream());
+					
+					Message handShake = new Message();
+					handShake.setPieceSize(_pieceSize);
+					handShake.readMessage(peer, _peerID);
+					
+					peer._inStream = inStream;
+					peer._outStream = outStream;
+					peer._socket = socket;
+					
+					handleHandshake(peer, handShake);
+				}
+				catch (Exception e) {
+					System.out.println("BAD in Server.run()");
+				}
 			} 			
 			//if we appear second we are a client
-			else if(_peerID > neighbor._peerID) {
-				setupClient();
+			else if(_peerID > peer._peerID) {
+				try {
+					NeighborInfo ni = getNeighborInfo(_peerID);
+					String hostName = ni.getHostName();
+					int portNum = ni.getPortNum();
+
+					System.out.println("Peer:" + _peerID + " trying to connect to " + hostName + " via socket " + portNum);
+					Socket socket = new Socket(hostName, portNum);
+					
+					DataOutputStream outStream = new DataOutputStream(socket.getOutputStream());
+					outStream.flush();
+					DataInputStream inStream = new DataInputStream(socket.getInputStream());
+					
+					peer._inStream = inStream;
+					peer._outStream = outStream;
+					peer._socket = socket;
+
+					//create input and output data streams, and save them in the peer
+					Message handShake = new Message();
+					handShake.setPieceSize(_pieceSize);
+					handShake.sendHandShake(peer, _peerID);
+					peer._handshakeSent = true;
+					System.out.println("Peer:" + _peerID + " sent handshake to Peer:" + peer._peerID);
+				}
+				catch (ConnectException e) {
+							System.err.println("Connection refused. You need to initiate a server first.");
+				} 
+				catch(UnknownHostException unknownHost){
+					System.err.println("You are trying to connect to an unknown host!");
+				}
+				catch(IOException ioException){
+					ioException.printStackTrace();
+				}
 			}
 		}
 	}
