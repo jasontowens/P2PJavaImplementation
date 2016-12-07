@@ -174,10 +174,11 @@ public class peerProcess implements Runnable{
 	
 	public void setupConnections() {
 		//get the peerMap and sort it by peerID
-		Collections.sort(_neighborInfos);
+		List<NeighborInfo> sortedNeighbors = _neighborInfos;
+		Collections.sort(sortedNeighbors);
 		
 		int count = 0;
-		for (NeighborInfo peer: _neighborInfos) {
+		for (NeighborInfo peer: sortedNeighbors) {
 			if (peer._peerID == _peerID) {
 				break;
 			}
@@ -185,10 +186,10 @@ public class peerProcess implements Runnable{
 			count++;
 		}
 		
-		_neighborInfos.remove(count); //ensure my peer info isn't in the list
+		sortedNeighbors.remove(count); //ensure my peer info isn't in the list
 		
 		int index = 0;
-		for (NeighborInfo peer: _neighborInfos) {
+		for (NeighborInfo peer: sortedNeighbors) {
 			//if we appear first we are a server
 			if(_peerID < peer._peerID) {
 				try {
@@ -211,8 +212,17 @@ public class peerProcess implements Runnable{
 					peer._inStream = inStream;
 					peer._outStream = outStream;
 					peer._socket = socket;
-					_neighborInfos.set(index, peer);  
-
+					
+					int peerLoop = 0;
+					for (NeighborInfo peerToUpdate: _neighborInfos) {
+						if (peerToUpdate._peerID == peer._peerID) {
+							_neighborInfos.set(peerLoop, peer);
+							break;
+						}
+						
+						peerLoop++;
+					}
+					
 					Message handShake = new Message();
 					handShake.setPieceSize(_pieceSize);					
 
@@ -248,7 +258,16 @@ public class peerProcess implements Runnable{
 					peer._inStream = inStream;
 					peer._outStream = outStream;
 					peer._socket = socket;
-					_neighborInfos.set(index, peer);  
+
+					int peerLoop = 0;
+					for (NeighborInfo peerToUpdate: _neighborInfos) {
+						if (peerToUpdate._peerID == peer._peerID) {
+							_neighborInfos.set(peerLoop, peer);
+							break;
+						}
+						
+						peerLoop++;
+					}
 
 					//create input and output data streams, and save them in the peer
 					Message handShake = new Message();
