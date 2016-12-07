@@ -158,7 +158,7 @@ public class Message
 				// arguments: byte array stored in, offset, length
 				// from java docs:
 				// Reads up to len bytes of data from the contained input stream into an array of bytes.
-				numBytesRecvd = peer._inStream.read(temp, totalBytesRecvd, 5 - totalBytesRecvd);
+				numBytesRecvd = peer._inStream.read(temp, totalBytesRecvd, 27 - totalBytesRecvd);
 				totalBytesRecvd += numBytesRecvd;
 			}			
 			byte[] peerIdToBe = { temp1[23], temp1[24], temp1[25], temp1[26] };
