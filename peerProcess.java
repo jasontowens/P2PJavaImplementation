@@ -178,6 +178,7 @@ public class peerProcess implements Runnable{
 		List<NeighborInfo> sortedNeighbors = _neighborInfos;
 		Collections.sort(sortedNeighbors);
 		sortedNeighbors.remove(Integer.valueOf(_peerID)); //ensure my peer info isn't in the list
+		_neighborInfos.remove(Integer.valueOf(_peerID)); //ensure my peer info isn't in the list
 
 		for (NeighborInfo peer: sortedNeighbors) {
 			//if we appear first we are a server
