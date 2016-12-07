@@ -339,12 +339,8 @@ public class peerProcess implements Runnable{
 		return null;
 	}
 
-	public synchronized void handleMessages() throws Exception {
-		System.out.println("Here is the neighbor info size: " + _neighborInfos.size());
-		
-		for(NeighborInfo peer : _neighborInfos) {
-			System.out.println("Here is the peer inStream inside handleMessages: " + peer._inStream);
-			
+	public synchronized void handleMessages() throws Exception {		
+		for(NeighborInfo peer : _neighborInfos) {			
 			// check to see if the peer has enough data to warrant a read
 			if(peer._inStream.available() >= 5) {
 				Message receivedMessage = new Message();
@@ -571,7 +567,6 @@ public class peerProcess implements Runnable{
 
 			while(true){
 				// todo remove parameter from function
-				System.out.println("peerProcess::run() -- in the while loop.");
 				handleMessages();
 
 				// if(System.currentTimeMillis() > unchokeTime + 1000*config.getUnchokingInterval()) {
