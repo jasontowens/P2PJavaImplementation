@@ -202,8 +202,9 @@ public class peerProcess implements Runnable{
 					peer._outStream = outStream;
 					peer._socket = socket;
 					
-					System.out.println("Here is the index: " + index);
 					_neighborInfos.set(index, peer);
+					NeighborInfo thomas = _neighborInfos.get(index);
+					System.out.println("Here is the peer inStream inside setupConnections for the server: " + thomas._inStream);
 
 					Message handShake = new Message();
 					handShake.setPieceSize(_pieceSize);					
@@ -241,8 +242,9 @@ public class peerProcess implements Runnable{
 					peer._outStream = outStream;
 					peer._socket = socket;
 					
-					System.out.println("Here is the index: " + index);
 					_neighborInfos.set(index, peer);
+					NeighborInfo thomas = _neighborInfos.get(index);
+					System.out.println("Here is the peer inStream inside setupConnections for the client: " + thomas._inStream);
 
 					//create input and output data streams, and save them in the peer
 					Message handShake = new Message();
@@ -313,6 +315,8 @@ public class peerProcess implements Runnable{
 
 	public synchronized void handleMessages() throws Exception {
 		for(NeighborInfo peer : _neighborInfos) {
+			System.out.println("Here is the peer inStream inside handleMessages: " + peer._inStream);
+			
 			// check to see if the peer has enough data to warrant a read
 			if(peer._inStream.available() >= 5) {
 				Message receivedMessage = new Message();
