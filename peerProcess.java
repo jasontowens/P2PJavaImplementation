@@ -386,8 +386,17 @@ public class peerProcess implements Runnable{
 						
 					default:
 						break;
+				}	
+			}
+
+			int peerLoop = 0;
+			for (NeighborInfo peerToUpdate: _neighborInfos) {
+				if (peerToUpdate._peerID == peer._peerID) {
+					_neighborInfos.set(peerLoop, peer);
+					break;
 				}
-			
+				
+				peerLoop++;
 			}
 		}
 	}
@@ -428,6 +437,16 @@ public class peerProcess implements Runnable{
 			peer._amIInterested = true; // record that I am interested
 			receivedMessage.sendInterested(peer);
 		}
+		
+		int peerLoop = 0;
+		for (NeighborInfo peerToUpdate: _neighborInfos) {
+			if (peerToUpdate._peerID == peer._peerID) {
+				_neighborInfos.set(peerLoop, peer);
+				break;
+			}
+			
+			peerLoop++;
+		}
 
 	}
 
@@ -456,6 +475,16 @@ public class peerProcess implements Runnable{
 
 				receivedMessage.sendNotInterested(peer);
 			}
+		}
+		
+		int peerLoop = 0;
+		for (NeighborInfo peerToUpdate: _neighborInfos) {
+			if (peerToUpdate._peerID == peer._peerID) {
+				_neighborInfos.set(peerLoop, peer);
+				break;
+			}
+			
+			peerLoop++;
 		}
 	}	
 
@@ -523,6 +552,16 @@ public class peerProcess implements Runnable{
 		}
 
 		peer._speed++; //updated how many pieces i got from last unchoking round	
+		
+		int peerLoop = 0;
+		for (NeighborInfo peerToUpdate: _neighborInfos) {
+			if (peerToUpdate._peerID == peer._peerID) {
+				_neighborInfos.set(peerLoop, peer);
+				break;
+			}
+			
+			peerLoop++;
+		}
 	}
 
 	// from project specs:
