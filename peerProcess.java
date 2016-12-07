@@ -174,11 +174,11 @@ public class peerProcess implements Runnable{
 	
 	public void setupConnections() {
 		//get the peerMap and sort it by peerID
-		List<NeighborInfo> sortedNeighbors = _neighborInfos;
-		Collections.sort(sortedNeighbors);
-		sortedNeighbors.remove(Integer.valueOf(_peerID)); //ensure my peer info isn't in the list
+		Collections.sort(_neighborInfos);
+		_neighborInfos.remove(Integer.valueOf(_peerID)); //ensure my peer info isn't in the list
 
-		for (NeighborInfo peer: sortedNeighbors) {
+		int index = 0;
+		for (NeighborInfo peer: _neighborInfos) {
 			//if we appear first we are a server
 			if(_peerID < peer._peerID) {
 				try {
@@ -201,6 +201,7 @@ public class peerProcess implements Runnable{
 					peer._inStream = inStream;
 					peer._outStream = outStream;
 					peer._socket = socket;
+					_neighborInfos.set(index, peer);  
 
 					Message handShake = new Message();
 					handShake.setPieceSize(_pieceSize);					
@@ -210,16 +211,6 @@ public class peerProcess implements Runnable{
 					
 					System.out.println("Calling handleHandshake");
 					handleHandshake(peer, handShake);
-					
-					int index = 0;
-					for (NeighborInfo peerToUpdate: _neighborInfos) {
-							if (peerToUpdate._peerID == peer._peerID) {
-								_neighborInfos.set(index, peer);  
-								index++;
-							}
-							
-							System.out.println("here is the index: " + index);
-					}
 					
 					System.out.println("Finished calling handleHandshake");
 				}
@@ -247,16 +238,7 @@ public class peerProcess implements Runnable{
 					peer._inStream = inStream;
 					peer._outStream = outStream;
 					peer._socket = socket;
-					
-					int index = 0;
-					for (NeighborInfo peerToUpdate: _neighborInfos) {
-							if (peerToUpdate._peerID == peer._peerID) {
-								_neighborInfos.set(index, peer);  
-								index++;
-							}
-							
-							System.out.println("here is the index: " + index);
-					}
+					_neighborInfos.set(index, peer);  
 
 					//create input and output data streams, and save them in the peer
 					Message handShake = new Message();
@@ -275,6 +257,8 @@ public class peerProcess implements Runnable{
 					ioException.printStackTrace();
 				}
 			}
+			
+			index++;
 		}
 	}
 
