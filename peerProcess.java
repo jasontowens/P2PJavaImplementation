@@ -343,6 +343,8 @@ public class peerProcess implements Runnable{
 				receivedMessage.setPieceSize(_pieceSize);
 				receivedMessage.readMessage(peer,_peerID); //read message
 		
+				System.out.println("Received message of type inside handleMessages: " + receivedMessage.getMessageType());
+		
 				switch (receivedMessage.getMessageType()) {
 					case HANDSHAKE:
 						handleHandshake(peer,receivedMessage);
