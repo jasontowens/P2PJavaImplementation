@@ -177,8 +177,8 @@ public class peerProcess implements Runnable{
 		Collections.sort(_neighborInfos);
 		_neighborInfos.remove(Integer.valueOf(_peerID)); //ensure my peer info isn't in the list
 
-		for (NeighborInfo peer: _neighborInfos) 
-		{
+		int index = 0;
+		for (NeighborInfo peer: _neighborInfos) {
 			//if we appear first we are a server
 			if(_peerID < peer._peerID) {
 				try {
@@ -201,6 +201,7 @@ public class peerProcess implements Runnable{
 					peer._inStream = inStream;
 					peer._outStream = outStream;
 					peer._socket = socket;
+					_neighborInfos.set(index, peer);
 
 					Message handShake = new Message();
 					handShake.setPieceSize(_pieceSize);					
@@ -237,6 +238,7 @@ public class peerProcess implements Runnable{
 					peer._inStream = inStream;
 					peer._outStream = outStream;
 					peer._socket = socket;
+					_neighborInfos.set(index, peer);
 
 					//create input and output data streams, and save them in the peer
 					Message handShake = new Message();
@@ -255,6 +257,8 @@ public class peerProcess implements Runnable{
 					ioException.printStackTrace();
 				}
 			}
+			
+			index++;
 		}
 	}
 
