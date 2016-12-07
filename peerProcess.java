@@ -382,12 +382,10 @@ public class peerProcess implements Runnable{
 		}
 	}
 
-
+	// when you are unchoked you will proceed to request to the peer that unchoked you
 	public void handleUnchoke(NeighborInfo peer, Message receivedMessage) throws Exception {
-		// myLogger.logUnchoking(peer._peerID);
 
 		int pieceIndex = _bitfield.getRandomNeededIndex(peer._bitfield); // get a pieceIndex i am interested in
-		
 		if(pieceIndex != -1) {
 
 			receivedMessage.wipe();
@@ -397,6 +395,7 @@ public class peerProcess implements Runnable{
 		}
 	}
 
+	// when 
 	public void handleHave(NeighborInfo peer, Message receivedMessage) throws IOException {
 		byte[] data = receivedMessage.getData(); 
 		ByteBuffer bb = ByteBuffer.wrap(data); 
@@ -499,6 +498,8 @@ public class peerProcess implements Runnable{
 			// todo brian impl ready to exit
 
 		}
+		// when you get the piece and you are not finished, you want to immediately send another request.
+		// todo brian, perhaps move the message creation to Message.java
 		else {
 			int newPieceIndex = _bitfield.getRandomNeededIndex(peer._bitfield);	
 			bb = ByteBuffer.allocate(4); // setup byte buffer for data
