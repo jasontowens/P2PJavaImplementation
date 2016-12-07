@@ -51,15 +51,6 @@ public class peerProcess implements Runnable{
 		//calculate pieceCount
 		
 		_numPieces = _fileSize / _pieceSize;
-		System.out.println("Number of pieces before calculation: " + _numPieces);
-		
-		if(_fileSize % _pieceSize != 0) {
-			_numPieces++;
-		}
-				
-		System.out.println("Number of byte pieces after calculation: " + _numPieces);
-		
-		
 		_bitfield = new BitField(_numPieces);
 
 		parsePeerConfig("peer_" + _peerID + "/PeerInfo.cfg");
