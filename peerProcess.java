@@ -207,6 +207,10 @@ public class peerProcess implements Runnable{
 				}
 				catch (Exception e) {
 					System.out.println("BAD in Server.run()");
+					StackTraceElement[] elements = e.getStackTrace();  
+					for (int iterator=1; iterator<=elements.length; iterator++)  {
+						System.out.println("Class Name:"+elements[iterator-1].getClassName()+" Method Name:"+elements[iterator-1].getMethodName()+" Line Number:"+elements[iterator-1].getLineNumber());
+					}
 				}
 			} 			
 			//if we appear second we are a client
@@ -234,7 +238,7 @@ public class peerProcess implements Runnable{
 					System.out.println("Peer:" + _peerID + " sent handshake to Peer:" + peer._peerID);
 				}
 				catch (ConnectException e) {
-							System.err.println("Connection refused. You need to initiate a server first.");
+					System.err.println("Connection refused. You need to initiate a server first.");
 				} 
 				catch(UnknownHostException unknownHost){
 					System.err.println("You are trying to connect to an unknown host!");
