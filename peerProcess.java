@@ -190,7 +190,6 @@ public class peerProcess implements Runnable{
 		
 		sortedNeighbors.remove(count); //ensure my peer info isn't in the list
 		
-		int index = 0;
 		for (NeighborInfo peer: sortedNeighbors) {
 			//if we appear first we are a server
 			if(_peerID < peer._peerID) {
@@ -288,9 +287,6 @@ public class peerProcess implements Runnable{
 					ioException.printStackTrace();
 				}
 			}
-			
-			System.out.println("Loop #" + index);
-			index++;
 		}
 	}
 
@@ -434,9 +430,7 @@ public class peerProcess implements Runnable{
 	}
 
 	public void handleBitfield(NeighborInfo peer, Message receivedMessage) throws Exception {
-		System.out.println("Here is the received message get data size: " + receivedMessage.getData().length);
 		peer._bitfield.setBitField(receivedMessage.getData()); //make the peers bitfield same as received
-		System.out.println("Peer#" + peer._peerID + " bitfield is " + peer._bitfield.getText());
 		
 		if(!peer._handshakeSent) {
 			System.out.println("Peer#" + _peerID + " sending bitfield to Peer#" + peer._peerID);
