@@ -5,11 +5,17 @@ import java.nio.*;
 import java.nio.channels.*;
 import java.util.*;
 
+//peerProcess is our largest class.  it is responsible for having a list of NeighborInfo objects which
+// in turn store a lot of information (see NeighborInfo.java) on peers that it knows about.  
+// Responsibilites include: managing its server and client functionalities, handling messages and updating
+// its _neighborInfos with the meaning of the message, creating messages and sending them.
+
 
 public class peerProcess implements Runnable{
 	// don't think it needs this at the moment, needs to only know info about its neighbors
 	// private PeerInfo _myPeerInfo;
 	ArrayList<NeighborInfo> _neighborInfos;
+	private FileManager _fileManager;
 	private Server _server; // todo brian replace with proper server type
 	private Client _client; // todo brian replace with proper client type
 	// private byte[] _bitfield;
@@ -42,8 +48,8 @@ public class peerProcess implements Runnable{
 
 		// kept out of the function kind of unnecessarily, but fn would still work
 		// if out of order config files were expected
-		_bitfield = new byte[_fileSize];
 		_numPieces = _fileSize / _pieceSize;
+		_bitfield = new BitField(_numPieces);
 
 		parsePeerConfig("peer_" + _peerID + "/PeerInfo.cfg");
 
@@ -66,7 +72,7 @@ public class peerProcess implements Runnable{
 		return _peerID;
 	}
 
-	public byte[] getBitfield(){
+	public BitField getBitfield(){
 		return _bitfield;
 	}
 
@@ -170,17 +176,17 @@ public class peerProcess implements Runnable{
 		//get the peerMap and sort it by peerID
 		List<NeighborInfo> sortedNeighbors = _neighborInfos;
 		Collections.sort(sortedNeighbors);
-		sortedNeighbors.remove(Integer.valueOf(this._peerID)); //ensure my peer info isn't in the list
+		sortedNeighbors.remove(Integer.valueOf(_peerID)); //ensure my peer info isn't in the list
 
 		for (NeighborInfo neighbor: sortedNeighbors) 
 		{
 			//if we appear first we are a server
 			if(_peerID < neighbor._peerID) {
-				this.setupServer();
+				setupServer();
 			} 			
 			//if we appear second we are a client
 			else if(_peerID > neighbor._peerID) {
-				this.setupClient();
+				setupClient();
 			}
 		}
 	}
@@ -260,7 +266,7 @@ public class peerProcess implements Runnable{
 	}
 
 	public synchronized void handleMessages(ArrayList<NeighborInfo> peers) throws Exception {
-		for(NeighborInfo peer: peers) {
+		for(NeighborInfo peer : peers) {
 			// check to see if the peer has enough data to warrant a read
 			if(peer._inStream.available() >= 5) {
 				Message receivedMessage = new Message();
@@ -278,16 +284,16 @@ public class peerProcess implements Runnable{
 		
 					case INTERESTED:
 						peer._isInterested = true; //update my record of the peer saying it's interested in my
-						// myLogger.logReceiveInterested(peer.peerID); //log the received interested message
 						break;
 		
 					case NOTINTERESTED:
 						peer._isInterested = false; 
-						// myLogger.logNotInterested(peer.peerID);
+						// myLogger.logNotInterested(peer._peerID);
 						break;
 		
 					case CHOKE:
-						// myLogger.logChoking(peer.peerID); //log the received notinterested message
+						// if you are choked, it pretty much means you want to do nothing to the 
+						// neighbor that choked you, because it is useless
 						break;
 					
 					case UNCHOKE:
@@ -314,26 +320,158 @@ public class peerProcess implements Runnable{
 		}
 	}
 
-	public void handleHandshake(NeighborInfo peer, Message receivedMessage) throws Exception {
-		System.out.println("Peer:" + _peerID + " got handshake from Peer:" + peer._peerID);
-		if(peer._handshakeSent) {
-			System.out.println("Peer:" + _peerID + " has already sent a HANDSHAKE to Peer:" + peer._peerID);
-			System.out.println("Peer:" + _peerID + " sending bitfield to Peer:" + peer._peerID);
-			// myLogger.logTCPConnTo(peer.peerID);
+
+	public void handleUnchoke(NeighborInfo peer, Message receivedMessage) throws Exception {
+		// myLogger.logUnchoking(peer._peerID);
+
+		int pieceIndex = _bitfield.getRandomNeededIndex(peer._bitfield); // get a pieceIndex i am interested in
+		
+		if(pieceIndex != -1) {
+
+			receivedMessage.wipe();
+			receivedMessage.sendRequest(peer,pieceIndex);
+
+			System.out.println("Peer#" + _peerID + " sent request for piece " + pieceIndex + " to Peer3" + peer._peerID);
+		}
+	}
+
+	public void handleHave(NeighborInfo peer, Message receivedMessage) throws IOException {
+		byte[] data = receivedMessage.getData(); 
+		ByteBuffer bb = ByteBuffer.wrap(data); 
+		int pieceIndex = bb.getInt(0); //get the piece index which is 0 offset from the start
+
+		// myLogger.logReceiveHave(peer._peerID,pieceIndex); //log receiving the have message
+		
+		peer._bitfield.turnOnBit(pieceIndex); 
+
+		int interest = _bitfield.getInterestingIndex(peer._bitfield);
+		receivedMessage.wipe();
+
+		// only send if changed
+		if(interest == -1 && peer._amIInterested) {
+			peer._amIInterested = false; 					// record that I am not interested
+			receivedMessage.sendNotInterested(peer);
+		}
+
+		else if (interest > -1 && !peer._amIInterested) {
+			peer._amIInterested = true; // record that I am interested
+			receivedMessage.sendInterested(peer);
+		}
+
+	}
+
+	public void handleBitfield(NeighborInfo peer, Message receivedMessage) throws Exception {
+		peer._bitfield.setBitField(receivedMessage.getData()); //make the peers bitfield same as received
+		System.out.println("Peer#" + peer._peerID + " bitfield is " + peer._bitfield.getText());
+		
+		if(!peer._handshakeSent) {
+			System.out.println("Peer#" + _peerID + " sending bitfield to Peer#" + peer._peerID);
 			receivedMessage.wipe();
 			receivedMessage.sendBitField(peer,_bitfield);
 		}
 		else {
-			System.out.println("Peer:" + _peerID + " has not yet sent a HANDSHAKE to Peer:" + peer._peerID);
-			System.out.println("Peer:" + _peerID + " sending handshake 2 to Peer:" + peer._peerID);
-			// myLogger.logTCPConnFrom(peer.peerID);
+			int interestingIndex = _bitfield.getInterestingIndex(peer._bitfield); //get interesting index compared to my bitfield
+			receivedMessage.wipe();
+			if (interestingIndex != -1) {
+				System.out.println("Peer#" + _peerID + " is interested in Peer#" + peer._peerID);
+				
+				peer._amIInterested = true; // record that I am interested
+
+				receivedMessage.sendInterested(peer);
+			}
+			else {
+				System.out.println("Peer#" + _peerID + " is not interested in Peer#" + peer._peerID);
+
+				peer._amIInterested = false; // record that I am not interested
+
+				receivedMessage.sendNotInterested(peer);
+			}
+		}
+	}	
+
+	public void handleRequest(NeighborInfo peer, Message receivedMessage) throws Exception {
+		ByteBuffer bb = ByteBuffer.wrap(receivedMessage.getData());
+		// find out what piece the peer requested
+		int pieceIndex = bb.getInt(0);
+		
+		if(pieceIndex != -1) {
+			System.out.println("Peer#" + _peerID + " received request for piece " + pieceIndex + " from Peer#" + peer._peerID);
+			// clear out the message so it is reusable
+			receivedMessage.wipe();
+			Pieces piece = _fileManager.getPiece(pieceIndex); // get the piece at the index
+			receivedMessage.sendPiece(peer, piece);
+			System.out.println("Peer#" + _peerID + " sent piece " + pieceIndex + " to Peer#" + peer._peerID);
+		}
+		else {
+			System.out.println("Peer#" + _peerID + " received a request from Peer#" + peer._peerID + " but they already have that piece");
+		}
+	}
+
+	public void handlePiece(NeighborInfo peer, Message receivedMessage) throws Exception {
+		byte[] data = receivedMessage.getData(); 
+		ByteBuffer bb = ByteBuffer.wrap(data);
+		int pieceIndex = bb.getInt(0);
+
+		byte[] pieceBytes = new byte[data.length - 4];
+		// an array copy of the piece (located at offset 4) into the pieceBytes 
+		System.arraycopy(data, 4, pieceBytes, 0, data.length - 4); 
+		Pieces piece = new Pieces(pieceIndex, pieceBytes); // create a concrete piece from the data
+
+		System.out.println("Peer#" + _peerID + " received and downloaded piece " + pieceIndex + " from Peer#" + peer._peerID);
+
+		_fileManager.putPiece(piece); //place piece in file
+		_bitfield.turnOnBit(pieceIndex); // change the bitfield so it is not requested again
+
+		// myLogger.logPieceDownload(peer._peerID,pieceIndex,_bitfield.getPiecesCountDowned()); //log the piece download
+
+		// todo brian clean up
+		for(NeighborInfo neighbor : _neighborInfos) {
+			receivedMessage.wipe();
+			receivedMessage.sendHave(neighbor, pieceIndex);
+		}
+		
+		if(_bitfield.isFinished()) {
+			System.out.println("Peer#" + _peerID + " is finished");
+			// myLogger.logDownloadComp(); 
+			// readyToExit();
+			// todo brian impl ready to exit
+
+		}
+		else {
+			int newPieceIndex = _bitfield.getRandomNeededIndex(peer._bitfield);	
+			bb = ByteBuffer.allocate(4); // setup byte buffer for data
+			byte[] msg = bb.putInt(newPieceIndex).array(); // put pieceIndex in byte[]
+			Message requestMsg = new Message();
+			requestMsg.setPieceSize(_pieceSize);
+			requestMsg.setMessageType((byte) 6);
+			requestMsg.setData(msg);
+			requestMsg.sendMessage(peer);
+			
+			System.out.println("Peer#" + _peerID + " sent request for piece " + newPieceIndex + " to Peer#" + peer._peerID);		
+		}
+
+		peer._speed++; //updated how many pieces i got from last unchoking round	
+	}
+
+	// from project specs:
+	// bitfield is only sent as the first message right after handshaking is done and connection is
+	// established.
+	public void handleHandshake(NeighborInfo peer, Message receivedMessage) throws Exception {
+		System.out.println("Peer#" + _peerID + " got handshake from Peer#" + peer._peerID);
+		// check if this peer has also sent a hand shake
+		if(peer._handshakeSent) {
+			System.out.println("Peer#" + _peerID + " has already sent a HANDSHAKE to Peer#" + peer._peerID);
+			System.out.println("Peer#" + _peerID + " sending bitfield to Peer#" + peer._peerID);
+			receivedMessage.wipe();
+			receivedMessage.sendBitField(peer,_bitfield);
+		}
+		else {
+			System.out.println("Peer#" + _peerID + " has not yet sent a HANDSHAKE to Peer#" + peer._peerID);
+			System.out.println("Peer#" + _peerID + " sending handshake 2 to Peer#" + peer._peerID);
 			receivedMessage.wipe();
 			receivedMessage.sendHandShake(peer, _peerID);
 		}
 	}
-
-
-
 
 
 
@@ -347,7 +485,7 @@ public class peerProcess implements Runnable{
 		try {
 			peerID = Integer.parseInt(args[0]);
 		}
-		catch (NumberFormatException e) {
+		catch (NumberFormatException | ArrayIndexOutOfBoundsException e ) {
 			System.out.println(args[0] + " is an invalid peerID");
 			System.out.println("You must supply the peerID when starting the program. Terminating.");
 			return;

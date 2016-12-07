@@ -99,6 +99,18 @@ public class Message
 		return _messageType;
 	}
 
+	public void setMessageType(MessageType mt) {
+		_messageType = mt;
+	}
+
+	public void setMessageType(byte b) {
+		_messageType = MessageType.get(b);
+	}
+
+	public void setData(byte[] data){
+		_data = data;
+	}
+
 	public void setPieceSize(int pieceSize) {
 		_pieceSize = pieceSize;
 	}
@@ -112,6 +124,9 @@ public class Message
 	// 	return _data.duplicate();
 	// }
 
+	public byte[] getData() {
+		return _data;
+	}
 
 	// will work with multithreaded parts
 	// 
@@ -284,12 +299,53 @@ public class Message
 		peer._outStream.flush();
 	}
 
+	public synchronized void sendInterested(NeighborInfo peer) throws IOException {
+		_messageType = MessageType.get((byte)2);
+		sendMessage(peer);
+	}
+
+	public synchronized void sendNotInterested(NeighborInfo peer) throws IOException {
+		_messageType = MessageType.get((byte)3);
+		sendMessage(peer);
+	}
+
+	public synchronized void sendHave(NeighborInfo peer, int pieceIndex) throws IOException {
+		_messageType = MessageType.get((byte)4);
+		ByteBuffer bb = ByteBuffer.allocate(4); 
+		_data = bb.putInt(pieceIndex).array();
+		sendMessage(peer);
+	}	
+
 	public synchronized void sendBitField(NeighborInfo peer, BitField bitfield) throws IOException {
 		_messageType = MessageType.get((byte)5);
 		_data = bitfield.toBytes(); //set the payload bitfield bytes
 		sendMessage(peer); //send bitfield
 	}
 
+	public synchronized void sendRequest(NeighborInfo peer, int pieceIndex) throws IOException {
+		_messageType = MessageType.get((byte)6);
+		
+		ByteBuffer bb = ByteBuffer.allocate(4); // setup byte buffer for data which is 4 byte aka 32bit int
+		_data = bb.putInt(pieceIndex).array(); // put pieceIndex into the bytebuffer, and then make it a byte array
+
+		sendMessage(peer);
+	}
+
+
+	// todo brian rename some stuff here
+	public synchronized void sendPiece(NeighborInfo peer, Pieces piece) throws IOException {
+		_messageType = MessageType.get((byte)7);
+		byte[] msg = new byte[piece.getPieceBytes().length + 4]; // create byte array for data
+		ByteBuffer bb = ByteBuffer.wrap(msg); // create byte buffer for payload
+		byte[] index = bb.putInt(piece.getPieceIndex()).array(); // put pieceIndex in the the first 4 bytes of the payload
+		
+		System.arraycopy(index, 0, msg, 0, index.length);
+		System.arraycopy(piece.getPieceBytes(), 0, msg, 4, piece.getPieceBytes().length); //copy the piece byte array to the payload array 
+		
+		
+		_data = msg; // set the payload to msg we just worked to create
+		sendMessage(peer);
+	}
 
 
 
