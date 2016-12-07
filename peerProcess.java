@@ -530,6 +530,7 @@ public class peerProcess implements Runnable{
 
 			while(true){
 				// todo remove parameter from function
+				System.out.println("peerProcess::run() -- in the while loop.");
 				handleMessages(_neighborInfos);
 
 				// if(System.currentTimeMillis() > unchokeTime + 1000*config.getUnchokingInterval()) {
