@@ -131,6 +131,8 @@ public class Message
 	// will work with multithreaded parts
 	// 
 	public synchronized void readMessage(NeighborInfo peer, int myID) throws IOException {
+		System.out.println("Here is the inStream inside readMessage: " + peer._inStream);
+		
 		byte [] temp = new byte[5];
 		int numBytesRecvd = 0;
 		int totalBytesRecvd = 0;
@@ -502,5 +504,3 @@ public class Message
 	}
 
 } // end class Message
-
-
