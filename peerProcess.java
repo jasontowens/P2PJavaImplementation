@@ -204,9 +204,14 @@ public class peerProcess implements Runnable{
 
 					Message handShake = new Message();
 					handShake.setPieceSize(_pieceSize);					
+
+					System.out.println("Calling readMessage");
 					handShake.readMessage(peer, _peerID);
 					
+					System.out.println("Calling handleHandshake");
 					handleHandshake(peer, handShake);
+					
+					System.out.println("Finished calling handleHandshake");
 				}
 				catch (Exception e) {
 					System.out.println("BAD in Server.run()");
