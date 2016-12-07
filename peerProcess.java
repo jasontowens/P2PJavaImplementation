@@ -197,14 +197,14 @@ public class peerProcess implements Runnable{
 					
 					DataInputStream inStream = new DataInputStream(socket.getInputStream());
 					System.out.println("Here is the inStream: " + inStream);
-
-					Message handShake = new Message();
-					handShake.setPieceSize(_pieceSize);
-					handShake.readMessage(peer, _peerID);
 					
 					peer._inStream = inStream;
 					peer._outStream = outStream;
 					peer._socket = socket;
+
+					Message handShake = new Message();
+					handShake.setPieceSize(_pieceSize);					
+					handShake.readMessage(peer, _peerID);
 					
 					handleHandshake(peer, handShake);
 				}
