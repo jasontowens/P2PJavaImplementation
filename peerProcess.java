@@ -308,6 +308,8 @@ public class peerProcess implements Runnable{
 	}
 
 	public synchronized void handleMessages() throws Exception {
+		System.out.println("Here is the neighbor info size: " + _neighborInfos.size());
+		
 		for(NeighborInfo peer : _neighborInfos) {
 			System.out.println("Here is the peer inStream inside handleMessages: " + peer._inStream);
 			
