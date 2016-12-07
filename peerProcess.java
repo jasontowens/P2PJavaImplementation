@@ -174,11 +174,12 @@ public class peerProcess implements Runnable{
 	
 	public void setupConnections() {
 		//get the peerMap and sort it by peerID
-		Collections.sort(_neighborInfos);
-		_neighborInfos.remove(Integer.valueOf(_peerID)); //ensure my peer info isn't in the list
+		
+		List<NeighborInfo> sortedNeighbors = _neighborInfos;
+		Collections.sort(sortedNeighbors);
+		sortedNeighbors.remove(Integer.valueOf(_peerID)); //ensure my peer info isn't in the list
 
-		int index = 0;
-		for (NeighborInfo peer: _neighborInfos) {
+		for (NeighborInfo peer: sortedNeighbors) {
 			//if we appear first we are a server
 			if(_peerID < peer._peerID) {
 				try {
@@ -202,9 +203,14 @@ public class peerProcess implements Runnable{
 					peer._outStream = outStream;
 					peer._socket = socket;
 					
-					_neighborInfos.set(index, peer);
-					NeighborInfo thomas = _neighborInfos.get(index);
-					System.out.println("Here is the peer inStream inside setupConnections for the server: " + thomas._inStream);
+					int index = 0;
+					for (NeighborInfo peerToUpdate: _neighborInfos) {
+							if (peerToUpdate._peerID == peer._peerID) {
+								_neighborInfos.set(index, peer);  
+							}
+							
+							index++;
+					}
 
 					Message handShake = new Message();
 					handShake.setPieceSize(_pieceSize);					
@@ -242,9 +248,14 @@ public class peerProcess implements Runnable{
 					peer._outStream = outStream;
 					peer._socket = socket;
 					
-					_neighborInfos.set(index, peer);
-					NeighborInfo thomas = _neighborInfos.get(index);
-					System.out.println("Here is the peer inStream inside setupConnections for the client: " + thomas._inStream);
+					int index = 0;
+					for (NeighborInfo peerToUpdate: _neighborInfos) {
+							if (peerToUpdate._peerID == peer._peerID) {
+								_neighborInfos.set(index, peer);  
+							}
+							
+							index++;
+					}
 
 					//create input and output data streams, and save them in the peer
 					Message handShake = new Message();
@@ -263,8 +274,6 @@ public class peerProcess implements Runnable{
 					ioException.printStackTrace();
 				}
 			}
-			
-			index++;
 		}
 	}
 
