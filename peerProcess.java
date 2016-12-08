@@ -343,7 +343,9 @@ public class peerProcess implements Runnable{
 				receivedMessage.setPieceSize(_pieceSize);
 				receivedMessage.readMessage(peer,_peerID); //read message
 		
+				System.out.println("THomas1");
 				System.out.println("Received message of type inside handleMessages: " + receivedMessage.getMessageType());
+				System.out.println("THomas2");
 		
 				switch (receivedMessage.getMessageType()) {
 					case HANDSHAKE:
@@ -351,6 +353,7 @@ public class peerProcess implements Runnable{
 						break;
 		
 					case BITFIELD:
+						System.out.println("Calling handleBitfield");
 						handleBitfield(peer,receivedMessage);
 						break;
 		
@@ -461,7 +464,7 @@ public class peerProcess implements Runnable{
 		}
 		else {
 			int interestingIndex = _bitfield.getInterestingIndex(peer._bitfield); //get interesting index compared to my bitfield
-			print("Here is the intersting index: " + interestingIndex);
+			System.out.println("Here is the intersting index: " + interestingIndex);
 			
 			receivedMessage.wipe();
 			if (interestingIndex != -1) {
