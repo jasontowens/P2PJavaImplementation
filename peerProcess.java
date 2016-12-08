@@ -343,11 +343,8 @@ public class peerProcess implements Runnable{
 				receivedMessage.setPieceSize(_pieceSize);
 				receivedMessage.readMessage(peer,_peerID); //read message
 		
-				System.out.println("THomas1");
 				System.out.println("Received message of type inside handleMessages: " + receivedMessage.getMessageType());
-				System.out.println("Received message with data inside handleMessages: " + receivedMessage.getData());
-				System.out.println("THomas2");
-		
+
 				switch (receivedMessage.getMessageType()) {
 					case HANDSHAKE:
 						handleHandshake(peer,receivedMessage);
@@ -456,8 +453,6 @@ public class peerProcess implements Runnable{
 
 	public void handleBitfield(NeighborInfo peer, Message receivedMessage) throws Exception {
 		System.out.println("Here is handle bitfield");
-		System.out.println("Received message with data inside handleMessages: " + receivedMessage.getData());
-
 		peer._bitfield.setBitField(receivedMessage.getData()); //make the peers bitfield same as received
 		
 		if(!peer._handshakeSent) {
