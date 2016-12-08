@@ -74,6 +74,7 @@ public class BitField {
 			int whichBit = i%8;
 			
 			if (bytes.length <= whichByte) {
+				System.out.println("Here is where the issues come");
 				break;
 			}
 			
