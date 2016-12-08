@@ -94,6 +94,7 @@ public class BitField {
 		int index = -1 ; 
 		for (int i = 0; i < piecesCount; i++) {
 			if ((bitField[i] == false) && b.bitField[i] == true) {
+				System.out.println("Intersting index is: " + i);
 				return i;
 			} 
 		}
