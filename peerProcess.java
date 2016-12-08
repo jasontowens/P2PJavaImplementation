@@ -489,7 +489,7 @@ public class peerProcess implements Runnable{
 			}
 		}
 		
-		int peerLoop = 0;
+		peerLoop = 0;
 		for (NeighborInfo peerToUpdate: _neighborInfos) {
 			if (peerToUpdate._peerID == peer._peerID) {
 				_neighborInfos.set(peerLoop, peer);
