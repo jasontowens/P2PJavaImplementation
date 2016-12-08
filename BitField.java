@@ -89,7 +89,7 @@ public class BitField {
 				System.out.println("Here is the whichBit for the first:" + whichBit);
 				System.out.println("Here is the bytes[whichByte] for the first:" + bytes[whichByte]);
 			}
-			if (bytes[whichByte] == 0 && ((bytes[whichByte] & (1 << whichBit)) == 0)) {
+			if ((bytes[whichByte] & (1 << whichBit)) == 0) {
 				bitField[i] = false;
 			} else {
 				bitField[i] = true;
@@ -102,9 +102,7 @@ public class BitField {
 		}
 	} 
  	
-	public int getInterestingIndex(BitField b) {
-		byte[] test = b.toBytes();
-		
+	public int getInterestingIndex(BitField b) {		
 		int index = -1 ; 
 		for (int i = 0; i < piecesCount; i++) {
 			if ((bitField[i] == false) && b.bitField[i] == true) {
