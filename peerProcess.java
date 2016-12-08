@@ -335,8 +335,8 @@ public class peerProcess implements Runnable{
 		return null;
 	}
 
-	public synchronized void handleMessages() throws Exception {		
-		for(NeighborInfo peer : _neighborInfos) {			
+	public synchronized void handleMessages(List<NeighborInfo> peers) throws Exception {		
+		for(NeighborInfo peer : peers) {			
 			// check to see if the peer has enough data to warrant a read
 			if(peer._inStream.available() >= 5) {
 				Message receivedMessage = new Message();
@@ -389,16 +389,6 @@ public class peerProcess implements Runnable{
 						break;
 				}	
 			}
-
-			int peerLoop = 0;
-			for (NeighborInfo peerToUpdate: _neighborInfos) {
-				if (peerToUpdate._peerID == peer._peerID) {
-					_neighborInfos.set(peerLoop, peer);
-					break;
-				}
-				
-				peerLoop++;
-			}
 		}
 	}
 
@@ -438,30 +428,11 @@ public class peerProcess implements Runnable{
 			peer._amIInterested = true; // record that I am interested
 			receivedMessage.sendInterested(peer);
 		}
-		
-		int peerLoop = 0;
-		for (NeighborInfo peerToUpdate: _neighborInfos) {
-			if (peerToUpdate._peerID == peer._peerID) {
-				_neighborInfos.set(peerLoop, peer);
-				break;
-			}
-			
-			peerLoop++;
-		}
 
 	}
 
 	public void handleBitfield(NeighborInfo peer, Message receivedMessage) throws Exception {
 		peer._bitfield.setBitField(receivedMessage.getData()); //make the peers bitfield same as received
-		int peerLoop = 0;
-		for (NeighborInfo peerToUpdate: _neighborInfos) {
-			if (peerToUpdate._peerID == peer._peerID) {
-				_neighborInfos.set(peerLoop, peer);
-				break;
-			}
-			
-			peerLoop++;
-		}
 		
 		if(!peer._handshakeSent) {
 			System.out.println("Peer#" + _peerID + " sending bitfield to Peer#" + peer._peerID);
@@ -487,16 +458,6 @@ public class peerProcess implements Runnable{
 
 				receivedMessage.sendNotInterested(peer);
 			}
-		}
-		
-		peerLoop = 0;
-		for (NeighborInfo peerToUpdate: _neighborInfos) {
-			if (peerToUpdate._peerID == peer._peerID) {
-				_neighborInfos.set(peerLoop, peer);
-				break;
-			}
-			
-			peerLoop++;
 		}
 	}	
 
@@ -564,16 +525,6 @@ public class peerProcess implements Runnable{
 		}
 
 		peer._speed++; //updated how many pieces i got from last unchoking round	
-		
-		int peerLoop = 0;
-		for (NeighborInfo peerToUpdate: _neighborInfos) {
-			if (peerToUpdate._peerID == peer._peerID) {
-				_neighborInfos.set(peerLoop, peer);
-				break;
-			}
-			
-			peerLoop++;
-		}
 	}
 
 	// from project specs:
@@ -614,7 +565,7 @@ public class peerProcess implements Runnable{
 
 			while(true){
 				// todo remove parameter from function
-				handleMessages();
+				handleMessages(_neighborInfos);
 
 				// if(System.currentTimeMillis() > unchokeTime + 1000*config.getUnchokingInterval()) {
 				// 	unchokingUpdate();
