@@ -451,6 +451,7 @@ public class peerProcess implements Runnable{
 	}
 
 	public void handleBitfield(NeighborInfo peer, Message receivedMessage) throws Exception {
+		System.out.println("Here is handle bitfield");
 		peer._bitfield.setBitField(receivedMessage.getData()); //make the peers bitfield same as received
 		
 		if(!peer._handshakeSent) {
