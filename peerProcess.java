@@ -460,6 +460,8 @@ public class peerProcess implements Runnable{
 		}
 		else {
 			int interestingIndex = _bitfield.getInterestingIndex(peer._bitfield); //get interesting index compared to my bitfield
+			print("Here is the intersting index: " + interestingIndex);
+			
 			receivedMessage.wipe();
 			if (interestingIndex != -1) {
 				System.out.println("Peer#" + _peerID + " is interested in Peer#" + peer._peerID);
