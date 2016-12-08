@@ -81,6 +81,7 @@ public class BitField {
 			if ((bytes[whichByte] & (1 << whichBit)) == 0) {
 				bitField[i] = false;
 			} else {
+				System.out.println("TRUE BIT");
 				bitField[i] = true;
 				piecesCountDowned++;
 			}
