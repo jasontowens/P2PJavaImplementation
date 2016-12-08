@@ -68,6 +68,8 @@ public class BitField {
 	}
 	
 	public void setBitField(byte[] bytes) {
+		System.out.println("Here are the bytes inside the bitfield: " + bytes);
+		
 		piecesCountDowned = 0;
 		for (int i = 0; i < piecesCount; i++) {
 			int whichByte = i/8;
