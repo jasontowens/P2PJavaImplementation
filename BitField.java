@@ -69,15 +69,26 @@ public class BitField {
 	
 	public void setBitField(byte[] bytes) {		
 		piecesCountDowned = 0;
+		
+		System.out.println("Here are the bytes in setBitField in BitField.java: ");
+		for (int i=0; i<bytes.length; i++) {
+			System.out.println(bytes[i]);
+		}
+		System.out.println("End of bytes in setBitField in BitField.java");
+		
 		for (int i = 0; i < piecesCount; i++) {
 			int whichByte = i/8;
 			int whichBit = i%8;
 			
 			if (bytes.length <= whichByte) {
-				System.out.println("Here is where the issues come");
 				break;
 			}
 						
+			if (i == 0) {
+				System.out.println("Here is the whichByte for the first:" + whichByte);
+				System.out.println("Here is the whichBit for the first:" + whichBit);
+				System.out.println("Here is the bytes[whichByte] for the first:" + bytes[whichByte]);
+			}
 			if ((bytes[whichByte] & (1 << whichBit)) == 0) {
 				bitField[i] = false;
 			} else {
@@ -91,7 +102,7 @@ public class BitField {
 		}
 	} 
  	
-	public int getInterestingIndex(BitField b) {
+	public int getInterestingIndex(BitField b) {		
 		int index = -1 ; 
 		for (int i = 0; i < piecesCount; i++) {
 			if ((bitField[i] == false) && b.bitField[i] == true) {

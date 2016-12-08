@@ -144,6 +144,11 @@ public class peerProcess implements Runnable{
 				neighborPortNum = Integer.parseInt(splitLine[2]);
 				neighborFullFile = ( Integer.parseInt(splitLine[3]) != 0 ); // if its 0 -> false  else -> true
 			
+				if (neighborID == _peerID && neighborFullFile == true) {
+					System.out.println("Setting bitfield to all true for peerID: " + _peerID);
+					_bitfield.turnOnAll();
+				}
+			
 				// does not incorporate error checking right now
 				// meaning that it will add itself into a _neighborInfos
 				// I know this logically doesn't make sense, but it makes it easier to gather
@@ -246,8 +251,7 @@ public class peerProcess implements Runnable{
 			//if we appear second we are a client
 			else if(_peerID > peer._peerID) {
 				try {
-					NeighborInfo ni = getNeighborInfo(_peerID);
-					int portNum = ni.getPortNum();
+					int portNum = peer.getPortNum();
 					String hostName = peer.getHostName();
 
 					System.out.println("Peer:" + _peerID + " trying to connect to " + hostName + " via socket " + portNum);
@@ -261,6 +265,12 @@ public class peerProcess implements Runnable{
 					peer._outStream = outStream;
 					peer._socket = socket;
 
+					//create input and output data streams, and save them in the peer
+					Message handShake = new Message();
+					handShake.setPieceSize(_pieceSize);
+					handShake.sendHandShake(peer, _peerID);
+					peer._handshakeSent = true;
+					
 					int peerLoop = 0;
 					for (NeighborInfo peerToUpdate: _neighborInfos) {
 						if (peerToUpdate._peerID == peer._peerID) {
@@ -270,12 +280,7 @@ public class peerProcess implements Runnable{
 						
 						peerLoop++;
 					}
-
-					//create input and output data streams, and save them in the peer
-					Message handShake = new Message();
-					handShake.setPieceSize(_pieceSize);
-					handShake.sendHandShake(peer, _peerID);
-					peer._handshakeSent = true;
+					
 					System.out.println("Peer:" + _peerID + " sent handshake to Peer:" + peer._peerID);
 				}
 				catch (ConnectException e) {
@@ -346,6 +351,7 @@ public class peerProcess implements Runnable{
 				
 				System.out.println("Received message of type inside handleMessages: " + receivedMessage.getMessageType());
 
+				int peerLoop = 0;
 				switch (receivedMessage.getMessageType()) {
 					case HANDSHAKE:
 						handleHandshake(peer,receivedMessage);
@@ -358,10 +364,32 @@ public class peerProcess implements Runnable{
 		
 					case INTERESTED:
 						peer._isInterested = true; //update my record of the peer saying it's interested in my
+						
+						peerLoop = 0;
+						for (NeighborInfo peerToUpdate: _neighborInfos) {
+							if (peerToUpdate._peerID == peer._peerID) {
+								_neighborInfos.set(peerLoop, peer);
+								break;
+							}
+							
+							peerLoop++;
+						}
+						
 						break;
 		
 					case NOTINTERESTED:
 						peer._isInterested = false; 
+						
+						peerLoop = 0;
+						for (NeighborInfo peerToUpdate: _neighborInfos) {
+							if (peerToUpdate._peerID == peer._peerID) {
+								_neighborInfos.set(peerLoop, peer);
+								break;
+							}
+							
+							peerLoop++;
+						}
+						
 						// myLogger.logNotInterested(peer._peerID);
 						break;
 		
@@ -449,6 +477,16 @@ public class peerProcess implements Runnable{
 				System.out.println("Peer#" + _peerID + " is interested in Peer#" + peer._peerID);
 				
 				peer._amIInterested = true; // record that I am interested
+				
+				int peerLoop = 0;
+				for (NeighborInfo peerToUpdate: _neighborInfos) {
+					if (peerToUpdate._peerID == peer._peerID) {
+						_neighborInfos.set(peerLoop, peer);
+						break;
+					}
+					
+					peerLoop++;
+				}
 
 				receivedMessage.sendInterested(peer);
 			}
@@ -456,6 +494,16 @@ public class peerProcess implements Runnable{
 				System.out.println("Peer#" + _peerID + " is not interested in Peer#" + peer._peerID);
 
 				peer._amIInterested = false; // record that I am not interested
+				
+				int peerLoop = 0;
+				for (NeighborInfo peerToUpdate: _neighborInfos) {
+					if (peerToUpdate._peerID == peer._peerID) {
+						_neighborInfos.set(peerLoop, peer);
+						break;
+					}
+					
+					peerLoop++;
+				}
 
 				receivedMessage.sendNotInterested(peer);
 			}
