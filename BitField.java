@@ -78,11 +78,11 @@ public class BitField {
 				break;
 			}
 			
+			System.out.println((bytes[whichByte]);
+			
 			if ((bytes[whichByte] & (1 << whichBit)) == 0) {
-				System.out.println("False bit");
 				bitField[i] = false;
 			} else {
-				System.out.println("TRUE BIT");
 				bitField[i] = true;
 				piecesCountDowned++;
 			}
