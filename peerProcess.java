@@ -342,7 +342,7 @@ public class peerProcess implements Runnable{
 				Message receivedMessage = new Message();
 				receivedMessage.setPieceSize(_pieceSize);
 				receivedMessage.readMessage(peer,_peerID); //read message
-		
+				
 				System.out.println("Received message of type inside handleMessages: " + receivedMessage.getMessageType());
 
 				switch (receivedMessage.getMessageType()) {
@@ -452,8 +452,16 @@ public class peerProcess implements Runnable{
 	}
 
 	public void handleBitfield(NeighborInfo peer, Message receivedMessage) throws Exception {
-		System.out.println("Here is handle bitfield");
 		peer._bitfield.setBitField(receivedMessage.getData()); //make the peers bitfield same as received
+		int peerLoop = 0;
+		for (NeighborInfo peerToUpdate: _neighborInfos) {
+			if (peerToUpdate._peerID == peer._peerID) {
+				_neighborInfos.set(peerLoop, peer);
+				break;
+			}
+			
+			peerLoop++;
+		}
 		
 		if(!peer._handshakeSent) {
 			System.out.println("Peer#" + _peerID + " sending bitfield to Peer#" + peer._peerID);
