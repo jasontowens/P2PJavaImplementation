@@ -104,11 +104,6 @@ public class BitField {
  	
 	public int getInterestingIndex(BitField b) {
 		byte[] test = b.toBytes();
-		System.out.println("Here is the bitfield in getInterestingIndex: ");		
-		for (int i = 0; i < test.length; i++) {
-			System.out.println(test[i]);
-		}
-		System.out.println("End of data in getInterestingIndex: ");		
 		
 		int index = -1 ; 
 		for (int i = 0; i < piecesCount; i++) {
