@@ -144,6 +144,10 @@ public class peerProcess implements Runnable{
 				neighborPortNum = Integer.parseInt(splitLine[2]);
 				neighborFullFile = ( Integer.parseInt(splitLine[3]) != 0 ); // if its 0 -> false  else -> true
 			
+				if (neighborID == _peerID && neighborFullFile == true) {
+					_bitfield.turnOnAll();
+				}
+			
 				// does not incorporate error checking right now
 				// meaning that it will add itself into a _neighborInfos
 				// I know this logically doesn't make sense, but it makes it easier to gather
