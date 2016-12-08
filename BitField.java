@@ -67,8 +67,12 @@ public class BitField {
 		return bytes;
 	}
 	
-	public void setBitField(byte[] bytes) {
-		System.out.println("Here are the bytes inside the bitfield: " + bytes);
+	public void setBitField(byte[] bytes) {		
+		System.out.println("Beginning of bytes array");
+		for (int i=0; i < bytes.length; i++) {
+			System.out.println(bytes[i]);
+		}
+		System.out.println("End of bytes array");
 		
 		piecesCountDowned = 0;
 		for (int i = 0; i < piecesCount; i++) {
@@ -79,7 +83,7 @@ public class BitField {
 				System.out.println("Here is where the issues come");
 				break;
 			}
-			
+						
 			if ((bytes[whichByte] & (1 << whichBit)) == 0) {
 				bitField[i] = false;
 			} else {
