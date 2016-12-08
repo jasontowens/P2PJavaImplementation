@@ -318,6 +318,13 @@ public class Message
 	public synchronized void sendBitField(NeighborInfo peer, BitField bitfield) throws IOException {
 		_messageType = MessageType.get((byte)5);
 		_data = bitfield.toBytes(); //set the payload bitfield bytes
+		
+		System.out.println("Here is the bitfield in sendBitField: ");		
+		for (int i = 0; i < _data.length; i++) {
+			System.out.println(_data[i]);
+		}
+		System.out.println("End of data in sendBitField: ");		
+		
 		sendMessage(peer); //send bitfield
 	}
 
