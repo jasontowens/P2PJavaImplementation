@@ -78,8 +78,6 @@ public class BitField {
 				break;
 			}
 			
-			System.out.println(bytes[whichByte]);
-			
 			if ((bytes[whichByte] & (1 << whichBit)) == 0) {
 				bitField[i] = false;
 			} else {
