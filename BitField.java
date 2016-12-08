@@ -84,6 +84,11 @@ public class BitField {
 				break;
 			}
 						
+			if (i == 0) {
+				System.out.println("Here is the whichByte for the first:" + whichByte);
+				System.out.println("Here is the whichBit for the first:" + whichBit);
+				System.out.println("Here is the bytes[whichByte] for the first:" + bytes[whichByte]);
+			}
 			if ((bytes[whichByte] & (1 << whichBit)) == 0) {
 				bitField[i] = false;
 			} else {

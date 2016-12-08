@@ -145,6 +145,7 @@ public class peerProcess implements Runnable{
 				neighborFullFile = ( Integer.parseInt(splitLine[3]) != 0 ); // if its 0 -> false  else -> true
 			
 				if (neighborID == _peerID && neighborFullFile == true) {
+					System.out.println("Setting bitfield to all true for peerID: " + _peerID);
 					_bitfield.turnOnAll();
 				}
 			
