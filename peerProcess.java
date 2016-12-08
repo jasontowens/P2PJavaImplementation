@@ -345,6 +345,7 @@ public class peerProcess implements Runnable{
 		
 				System.out.println("THomas1");
 				System.out.println("Received message of type inside handleMessages: " + receivedMessage.getMessageType());
+				System.out.println("Received message with data inside handleMessages: " + receivedMessage.getData());
 				System.out.println("THomas2");
 		
 				switch (receivedMessage.getMessageType()) {
