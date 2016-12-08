@@ -71,7 +71,6 @@ public class Message
 		{
 			for (MessageType mt : MessageType.values()) 
 			{
-				System.out.println("mt = " + mt + ". c = " + c);
 				if (mt.getID() == c) 
 				{
 					return mt;	
